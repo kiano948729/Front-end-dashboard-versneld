@@ -8,4 +8,7 @@ export interface Character {
   realm: string;
   spouse: string;
   wikiUrl: string;
+  powerChange: number;
+  powerLevel: number;
+  isFavorite: boolean;
 }
