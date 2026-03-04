@@ -1,4 +1,4 @@
-export interface Character {
+export interface ApiCharacter {
   _id: string;
   name: string;
   race: string;
@@ -8,6 +8,9 @@ export interface Character {
   realm: string;
   spouse: string;
   wikiUrl: string;
+}
+
+export interface Character extends ApiCharacter {
   powerChange: number;
   powerLevel: number;
   isFavorite: boolean;
