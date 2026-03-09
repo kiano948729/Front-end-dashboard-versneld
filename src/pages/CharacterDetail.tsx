@@ -1,5 +1,11 @@
 import { useParams, Link } from "react-router";
-import { ArrowLeft, Star, TrendingUp, TrendingDown, ExternalLink } from "lucide-react";
+import {
+  ArrowLeft,
+  Star,
+  TrendingUp,
+  TrendingDown,
+  ExternalLink,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { api } from "../api/api";
 import type { ApiCharacter, Character } from "../types/character";
@@ -12,6 +18,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { mapApiCharacterToCharacter } from "../utils/characterMapper";
 
 export default function CharacterDetail() {
   const { id } = useParams<{ id: string }>();
@@ -22,27 +29,33 @@ export default function CharacterDetail() {
 
   useEffect(() => {
     async function fetchCharacter() {
+      setLoading(true);
+      setError("");
       try {
-        const response = await api.get<{ docs: ApiCharacter[] }>(`/character/${id}`);
-        const data = response.data.docs[0];
+        if (!id) return;
 
-        const mappedCharacter: Character = {
-          ...data,
-          powerLevel: Math.floor(Math.random() * 10000) + 5000,
-          powerChange: Math.random() * 10 - 5,
-          isFavorite: false,
-        };
+        const response = await api.get<{ docs: ApiCharacter[] }>(
+          `/character/${id}`,
+        );
+        const data = response.data.docs;
 
+        if (data.length === 0) {
+          setError("Character not found");
+          return;
+        }
+
+        const mappedCharacter = mapApiCharacterToCharacter(data[0]);
         setCharacter(mappedCharacter);
         setIsFavorite(mappedCharacter.isFavorite);
-      } catch {
+      } catch (err: any) {
+        console.error("Failed to fetch character:", err);
         setError("Failed to load character");
       } finally {
         setLoading(false);
       }
     }
 
-    if (id) fetchCharacter();
+    fetchCharacter();
   }, [id]);
 
   if (loading) {
@@ -88,10 +101,16 @@ export default function CharacterDetail() {
             <div className="rounded-xl bg-[#1E293B] p-6 shadow-lg">
               <div className="mb-6 flex items-start justify-between">
                 <div>
-                  <h1 className="mb-2 text-3xl font-bold text-white">{character.name}</h1>
+                  <h1 className="mb-2 text-3xl font-bold text-white">
+                    {character.name}
+                  </h1>
                   <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-[#0F172A] px-3 py-1 text-sm text-gray-400">{character.race}</span>
-                    <span className="text-sm text-gray-500">{character.gender}</span>
+                    <span className="rounded-md bg-[#0F172A] px-3 py-1 text-sm text-gray-400">
+                      {character.race}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {character.gender}
+                    </span>
                   </div>
                 </div>
                 <button
@@ -105,16 +124,29 @@ export default function CharacterDetail() {
               </div>
 
               <div className="mb-6 border-t border-[#334155] pt-6">
-                <p className="mb-2 text-sm text-gray-400">Current Power Level</p>
+                <p className="mb-2 text-sm text-gray-400">
+                  Current Power Level
+                </p>
                 <div className="flex items-baseline gap-3">
                   <span className="text-4xl font-bold text-white">
-                    ${character.powerLevel.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    $
+                    {character.powerLevel.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
                 <div className="mt-3 flex items-center gap-2">
-                  {isPositive ? <TrendingUp className="h-5 w-5 text-[#22C55E]" /> : <TrendingDown className="h-5 w-5 text-[#EF4444]" />}
-                  <span className={`text-lg font-semibold ${isPositive ? "text-[#22C55E]" : "text-[#EF4444]"}`}>
-                    {isPositive ? "+" : ""}{character.powerChange.toFixed(2)}%
+                  {isPositive ? (
+                    <TrendingUp className="h-5 w-5 text-[#22C55E]" />
+                  ) : (
+                    <TrendingDown className="h-5 w-5 text-[#EF4444]" />
+                  )}
+                  <span
+                    className={`text-lg font-semibold ${isPositive ? "text-[#22C55E]" : "text-[#EF4444]"}`}
+                  >
+                    {isPositive ? "+" : ""}
+                    {character.powerChange.toFixed(2)}%
                   </span>
                   <span className="text-sm text-gray-400">24h</span>
                 </div>
@@ -155,20 +187,42 @@ export default function CharacterDetail() {
           <div className="space-y-8 lg:col-span-2">
             <div className="rounded-xl bg-[#1E293B] p-6 shadow-lg">
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-white">Price History (30 Days)</h2>
-                <p className="text-sm text-gray-400">Historical power level trends</p>
+                <h2 className="text-xl font-bold text-white">
+                  Power History (30 Days)
+                </h2>
+                <p className="text-sm text-gray-400">
+                  Historical power level trends
+                </p>
               </div>
 
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={priceHistory}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="day" stroke="#64748B" tick={{ fill: "#64748B" }} />
+                  <XAxis
+                    dataKey="day"
+                    stroke="#64748B"
+                    tick={{ fill: "#64748B" }}
+                  />
                   <YAxis stroke="#64748B" tick={{ fill: "#64748B" }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: "#1E293B", border: "1px solid #334155", borderRadius: "8px", color: "#fff" }}
-                    formatter={(value: number | undefined) => [value !== undefined ? `$${value.toFixed(2)}` : "$0.00", "Price"]}
+                    contentStyle={{
+                      backgroundColor: "#1E293B",
+                      border: "1px solid #334155",
+                      borderRadius: "8px",
+                      color: "#fff",
+                    }}
+                    formatter={(value: number | undefined) => [
+                      value !== undefined ? `${value.toFixed(2)}` : "0.00",
+                      "Power Level",
+                    ]}
                   />
-                  <Line type="monotone" dataKey="price" stroke="#D4AF37" strokeWidth={2} dot={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="price"
+                    stroke="#D4AF37"
+                    strokeWidth={2}
+                    dot={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
