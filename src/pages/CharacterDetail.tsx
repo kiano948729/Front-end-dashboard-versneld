@@ -95,7 +95,7 @@ export default function CharacterDetail() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-[1400px] px-6 py-8">
+      <main className="w-full px-6 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-1">
             <div className="rounded-xl bg-[#1E293B] p-6 shadow-lg">
@@ -129,7 +129,6 @@ export default function CharacterDetail() {
                 </p>
                 <div className="flex items-baseline gap-3">
                   <span className="text-4xl font-bold text-white">
-                    $
                     {character.powerLevel.toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
