@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Navbar from "./navbar";
+import Navbar from "./Navbar";
 
 interface LayoutProps {
   children: ReactNode;
@@ -7,9 +7,9 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-[#0F172A]">
       <Navbar />
-      <main className="p-6 max-w-7xl mx-auto">
+      <main className="w-full px-6 py-8">
         {children}
       </main>
     </div>
