@@ -7,14 +7,14 @@ import SearchFilterBar from "../components/SearchFilterBar";
 import AssetCard from "../components/AssetCard";
 import type { ApiCharacter, Character } from "../types/character";
 import { api } from "../api/api";
- import { mapApiCharactersToCharacters } from "../utils/characterMapper";
+import { mapApiCharactersToCharacters } from "../utils/characterMapper";
 
 export function getUniqueRaces(characters: Character[]): string[] {
   return Array.from(new Set(characters.map((c) => c.race)));
 }
 
 export function getRaceDistribution(
-  characters: Character[]
+  characters: Character[],
 ): { name: string; value: number }[] {
   const counts: Record<string, number> = {};
   characters.forEach((c) => {
@@ -30,32 +30,31 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    async function fetchCharacters() {
+      setLoading(true);
+      setError("");
+      try {
+        const response = await api.get<{ docs: ApiCharacter[] }>("/character");
+        const data = response.data.docs;
 
-useEffect(() => {
-  async function fetchCharacters() {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await api.get<{ docs: ApiCharacter[] }>("/character");
-      const data = response.data.docs;
-
-      const mappedCharacters = mapApiCharactersToCharacters(data);
-      setCharacters(mappedCharacters);
-    } catch (err: any) {
-      console.error("Failed to fetch characters:", err);
-      setError("Failed to load characters");
-    } finally {
-      setLoading(false);
+        const mappedCharacters = mapApiCharactersToCharacters(data);
+        setCharacters(mappedCharacters);
+      } catch (err: any) {
+        console.error("Failed to fetch characters:", err);
+        setError("Failed to load characters");
+      } finally {
+        setLoading(false);
+      }
     }
-  }
 
-  fetchCharacters();
-}, []);
+    fetchCharacters();
+  }, []);
 
   const races = useMemo(() => getUniqueRaces(characters), [characters]);
   const raceDistribution = useMemo(
     () => getRaceDistribution(characters),
-    [characters]
+    [characters],
   );
 
   const filteredCharacters = useMemo(() => {
@@ -78,8 +77,8 @@ useEffect(() => {
   const handleToggleFavorite = (id: string) => {
     setCharacters((prev) =>
       prev.map((char) =>
-        char._id === id ? { ...char, isFavorite: !char.isFavorite } : char
-      )
+        char._id === id ? { ...char, isFavorite: !char.isFavorite } : char,
+      ),
     );
   };
 
@@ -103,7 +102,7 @@ useEffect(() => {
     <div className="min-h-screen bg-[#0F172A]">
       <Navbar favoriteCount={favoriteCount} />
 
-      <main className="mx-auto max-w-[1400px] px-6 py-8">
+      <main className="w-full min-h-screen px-6 py-8">
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
           <KPICard
             title="Total Assets"

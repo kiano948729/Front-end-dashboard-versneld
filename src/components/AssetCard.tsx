@@ -7,12 +7,15 @@ interface AssetCardProps {
   onToggleFavorite: (id: string) => void;
 }
 
-export default function AssetCard({ character, onToggleFavorite }: AssetCardProps) {
+export default function AssetCard({
+  character,
+  onToggleFavorite,
+}: AssetCardProps) {
   const isPositive = character.powerChange >= 0;
 
   return (
-    <Link to={`/character/${character._id}`}>
-      <div className="group relative overflow-hidden rounded-xl bg-[#1E293B] p-5 shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-[#D4AF37]/10 hover:ring-2 hover:ring-[#D4AF37]">
+    <Link to={`/character/${character._id}`} className="w-full">
+      <div className="w-full group relative overflow-hidden rounded-xl bg-[#1E293B] p-5 shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-[#D4AF37]/10 hover:ring-2 hover:ring-[#D4AF37]">
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -30,7 +33,9 @@ export default function AssetCard({ character, onToggleFavorite }: AssetCardProp
         </button>
 
         <div className="mb-4">
-          <h3 className="mb-1 text-xl font-bold text-white">{character.name}</h3>
+          <h3 className="mb-1 text-xl font-bold text-white">
+            {character.name}
+          </h3>
           <div className="flex items-center gap-3 text-sm">
             <span className="rounded-md bg-[#0F172A] px-2 py-1 text-gray-400">
               {character.race}
@@ -42,7 +47,10 @@ export default function AssetCard({ character, onToggleFavorite }: AssetCardProp
         <div className="space-y-2">
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-bold text-white">
-              ${character.powerLevel.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {character.powerLevel.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </span>
           </div>
 
@@ -53,9 +61,7 @@ export default function AssetCard({ character, onToggleFavorite }: AssetCardProp
               <TrendingDown className="h-4 w-4 text-[#EF4444]" />
             )}
             <span
-              className={`text-sm font-semibold ${
-                isPositive ? "text-[#22C55E]" : "text-[#EF4444]"
-              }`}
+              className={`text-sm font-semibold ${isPositive ? "text-[#22C55E]" : "text-[#EF4444]"}`}
             >
               {isPositive ? "+" : ""}
               {character.powerChange.toFixed(2)}%
