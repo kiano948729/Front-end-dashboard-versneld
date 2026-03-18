@@ -1,11 +1,11 @@
-import { defineConfig } from 'vite'
-import path from 'path'
-import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react'
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config';
+import path from 'path';
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [
-
     react(),
     tailwindcss(),
   ],
@@ -14,6 +14,15 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-
   assetsInclude: ['**/*.svg', '**/*.csv'],
-})
+
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.ts',
+    include: ['src/**/*.test.tsx', 'tests/**/*.ts', 'tests/**/*.tsx'],
+    coverage: {
+      reporter: ['text', 'html', 'json'],
+    },
+  },
+});
