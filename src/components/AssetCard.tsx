@@ -1,6 +1,6 @@
 import { Star, TrendingUp, TrendingDown } from "lucide-react";
 import type { Character } from "../types/character";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 interface AssetCardProps {
   character: Character;
