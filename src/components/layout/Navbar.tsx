@@ -1,15 +1,41 @@
-import { Link } from "react-router-dom";
+import { Star } from "lucide-react";
 
-const Navbar = () => {
+interface NavbarProps {
+  favoriteCount: number;
+  onToggleFavorites: () => void;
+  showFavorites: boolean;
+}
+
+export default function Navbar({
+  favoriteCount,
+  onToggleFavorites,
+  showFavorites,
+}: NavbarProps) {
   return (
-    <nav className="bg-black text-white px-6 py-4 shadow-md">
-      <div className="max-w-7xl mx-auto flex justify-between">
-        <Link to="/" className="text-xl font-bold">
-          LOTR Market Dashboard
-        </Link>
+    <nav className="border-b border-[#1E293B] bg-[#0F172A]">
+      <div className="mx-auto max-w-350 px-6">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex flex-col">
+            <h1 className="text-xl font-bold text-[#D4AF37]">LOTR MARKET</h1>
+            <p className="text-xs text-gray-400">
+              Middle-earth Financial Overview
+            </p>
+          </div>
+
+          <div
+            onClick={onToggleFavorites}
+            className={`cursor-pointer flex items-center gap-2 rounded-lg px-4 py-2 ${
+              showFavorites ? "bg-yellow-600" : "bg-[#1E293B]"
+            }`}
+          >
+            <Star className="h-4 w-4 text-[#D4AF37]" fill="#D4AF37" />
+            <span className="text-sm font-medium text-white">
+              {favoriteCount}
+            </span>
+            <span className="text-xs text-gray-400">Favorites</span>
+          </div>
+        </div>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

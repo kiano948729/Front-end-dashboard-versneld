@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Users, Shield, TrendingUp } from "lucide-react";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/layout/Navbar";
 import KPICard from "../components/KPICard";
 import MarketShareChart from "../components/MarketShareChart";
 import SearchFilterBar from "../components/SearchFilterBar";
@@ -29,7 +29,7 @@ export default function Dashboard() {
   const [selectedRace, setSelectedRace] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [showFavorites, setShowFavorites] = useState(false);
   useEffect(() => {
     async function fetchCharacters() {
       setLoading(true);
@@ -62,10 +62,14 @@ export default function Dashboard() {
       const matchesSearch = char.name
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
+
       const matchesRace = !selectedRace || char.race === selectedRace;
-      return matchesSearch && matchesRace;
+
+      const matchesFavorites = !showFavorites || char.isFavorite;
+
+      return matchesSearch && matchesRace && matchesFavorites;
     });
-  }, [characters, searchTerm, selectedRace]);
+  }, [characters, searchTerm, selectedRace, showFavorites]);
 
   const favoriteCount = characters.filter((c) => c.isFavorite).length;
   const totalRaces = races.length;
@@ -100,8 +104,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#0F172A]">
-      <Navbar favoriteCount={favoriteCount} />
-
+      <Navbar
+        favoriteCount={favoriteCount}
+        showFavorites={showFavorites}
+        onToggleFavorites={() => setShowFavorites((prev) => !prev)}
+      />
       <main className="w-full min-h-screen px-6 py-8">
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
           <KPICard
